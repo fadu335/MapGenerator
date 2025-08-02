@@ -3,6 +3,7 @@ import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.onsets.ComplexOnsetDetector;
 import be.tarsos.dsp.onsets.OnsetHandler;
 import com.formdev.flatlaf.FlatLightLaf;
+import difficulty.Difficulty;
 import point.Point;
 import point.PointGenerator;
 
@@ -23,6 +24,7 @@ public class Gen implements OnsetHandler {
 
     private int lastX = -1;
     private int lastY = -1;
+    private static Difficulty difficulty = Difficulty.EASY;
 
     public static void main(String[] args) {
         FlatLightLaf.setup();
@@ -37,9 +39,11 @@ public class Gen implements OnsetHandler {
         JPanel panel = new JPanel();
         JButton button = new JButton("Choose a song");
         JButton copyButton = new JButton("Copy");
+        JButton difficultyButton = new JButton("Difficulty: EASY");
 
         panel.add(button);
         panel.add(copyButton);
+        panel.add(difficultyButton);
 
         textArea.setEditable(true);
         JScrollPane scrollPane = new JScrollPane(textArea);
@@ -74,6 +78,11 @@ public class Gen implements OnsetHandler {
             }
         });
 
+        difficultyButton.addActionListener(e -> {
+            difficulty = difficulty.next();
+            difficultyButton.setText("Difficulty: " + difficulty.name());
+        });
+
         frame.pack();
         frame.setVisible(true);
     }
@@ -98,10 +107,19 @@ public class Gen implements OnsetHandler {
         } else {
             List<Point> possibleNextPoints = getPoints();
 
-            if (!possibleNextPoints.isEmpty()) {
-                Point chosenPoint = possibleNextPoints.get(ThreadLocalRandom.current().nextInt(possibleNextPoints.size()));
-                nextX = (int) chosenPoint.x();
-                nextY = (int) chosenPoint.y();
+            if (difficulty == Difficulty.EASY) {
+                Point chosen = possibleNextPoints.get(ThreadLocalRandom.current().nextInt(possibleNextPoints.size()));
+                nextX = (int) chosen.x();
+                nextY = (int) chosen.y();
+            } else if (difficulty == Difficulty.MEDIUM) {
+                if (ThreadLocalRandom.current().nextBoolean()) {
+                    Point chosen = possibleNextPoints.get(ThreadLocalRandom.current().nextInt(possibleNextPoints.size()));
+                    nextX = (int) chosen.x();
+                    nextY = (int) chosen.y();
+                } else {
+                    nextX = lastX;
+                    nextY = lastY;
+                }
             } else {
                 nextX = ThreadLocalRandom.current().nextInt(0, 3);
                 nextY = ThreadLocalRandom.current().nextInt(0, 3);
