@@ -23,3 +23,25 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+tasks.jar {
+    manifest {
+        attributes(
+            "Main-Class" to "Gen"
+        )
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from({
+        configurations.runtimeClasspath.get()
+            .filter { it.name.endsWith("jar") }
+            .map { zipTree(it) }
+    })
+}

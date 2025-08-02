@@ -8,6 +8,8 @@ import point.PointGenerator;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +28,18 @@ public class Gen implements OnsetHandler {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 300);
         JPanel panel = new JPanel();
-        JButton button = new JButton("Выбрать песню");
+        JButton button = new JButton("Choose a song");
+        JButton copyButton = new JButton("Copy");
+
         panel.add(button);
+        panel.add(copyButton);
+
         textArea.setEditable(true);
         JScrollPane scrollPane = new JScrollPane(textArea);
         panel.add(scrollPane);
 
         frame.getContentPane().add(BorderLayout.CENTER, panel);
+
         button.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setCurrentDirectory(new File(System.getProperty("user.home"), "Downloads"));
@@ -45,6 +52,18 @@ public class Gen implements OnsetHandler {
                 File selectedFile = fileChooser.getSelectedFile();
 
                 startProcessing(selectedFile.getAbsolutePath());
+            }
+        });
+
+        copyButton.addActionListener(e -> {
+            String textToCopy = textArea.getText();
+            if (!textToCopy.isEmpty()) {
+                StringSelection stringSelection = new StringSelection(textToCopy);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(stringSelection, null);
+                JOptionPane.showMessageDialog(frame, "The text has been copied to the clipboard!");
+            } else {
+                JOptionPane.showMessageDialog(frame, "There is no data to copy", "Error", JOptionPane.WARNING_MESSAGE);
             }
         });
 
