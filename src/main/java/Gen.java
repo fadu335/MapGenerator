@@ -99,32 +99,54 @@ public class Gen implements OnsetHandler {
 
     @Override
     public void handleOnset(double time, double salience) {
+        generatePoint(time);
+
+        if (difficulty == Difficulty.HARD && ThreadLocalRandom.current().nextDouble() < 0.15) {
+            generatePoint(time + 0.03);
+        }
+    }
+
+    private void generatePoint(double time) {
         int nextX, nextY;
 
         if (lastX == -1) {
             nextX = ThreadLocalRandom.current().nextInt(0, 3);
             nextY = ThreadLocalRandom.current().nextInt(0, 3);
         } else {
-            List<Point> possibleNextPoints = getPoints();
-
-            if (difficulty == Difficulty.EASY) {
+            if (difficulty == Difficulty.HARD) {
+                if (ThreadLocalRandom.current().nextDouble() < 0.7) {
+                    int patternType = ThreadLocalRandom.current().nextInt(0, 3);
+                    nextY = switch (patternType) {
+                        case 0 -> {
+                            nextX = Math.min(lastX + 1, 2);
+                            yield lastY;
+                        }
+                        case 1 -> {
+                            nextX = Math.min(lastX + 1, 2);
+                            yield Math.min(lastY + 1, 2);
+                        }
+                        default -> {
+                            nextX = ThreadLocalRandom.current().nextInt(0, 3);
+                            yield ThreadLocalRandom.current().nextInt(0, 3);
+                        }
+                    };
+                } else {
+                    nextX = ThreadLocalRandom.current().nextInt(0, 3);
+                    nextY = ThreadLocalRandom.current().nextInt(0, 3);
+                }
+            } else if (difficulty == Difficulty.EASY || difficulty == Difficulty.MEDIUM) {
+                List<Point> possibleNextPoints = getPoints();
                 Point chosen = possibleNextPoints.get(ThreadLocalRandom.current().nextInt(possibleNextPoints.size()));
                 nextX = (int) chosen.x();
                 nextY = (int) chosen.y();
-            } else if (difficulty == Difficulty.MEDIUM) {
-                if (ThreadLocalRandom.current().nextBoolean()) {
-                    Point chosen = possibleNextPoints.get(ThreadLocalRandom.current().nextInt(possibleNextPoints.size()));
-                    nextX = (int) chosen.x();
-                    nextY = (int) chosen.y();
-                } else {
-                    nextX = lastX;
-                    nextY = lastY;
-                }
             } else {
                 nextX = ThreadLocalRandom.current().nextInt(0, 3);
                 nextY = ThreadLocalRandom.current().nextInt(0, 3);
             }
         }
+
+        nextX = Math.max(0, Math.min(2, nextX));
+        nextY = Math.max(0, Math.min(2, nextY));
 
         lastX = nextX;
         lastY = nextY;
