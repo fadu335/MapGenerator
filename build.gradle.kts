@@ -18,6 +18,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("be.tarsos.dsp:core:2.5")
     implementation("be.tarsos.dsp:jvm:2.5")
+    implementation("com.formdev:flatlaf:3.4.1")
 }
 
 tasks.test {

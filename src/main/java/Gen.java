@@ -2,6 +2,7 @@ import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.onsets.ComplexOnsetDetector;
 import be.tarsos.dsp.onsets.OnsetHandler;
+import com.formdev.flatlaf.FlatLightLaf;
 import point.Point;
 import point.PointGenerator;
 
@@ -17,16 +18,22 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Gen implements OnsetHandler {
 
-    public static List<Point> points = new ArrayList<>();
-    public static JTextArea textArea = new JTextArea(10, 30);
+    private static final List<Point> points = new ArrayList<>();
+    private static final JTextArea textArea = new JTextArea(15, 30);
 
     private int lastX = -1;
     private int lastY = -1;
 
     public static void main(String[] args) {
+        FlatLightLaf.setup();
+
+        SwingUtilities.invokeLater(Gen::createAndShowGui);
+    }
+
+    private static void createAndShowGui() {
         JFrame frame = new JFrame("Point Generator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 300);
+        frame.setSize(600, 900);
         JPanel panel = new JPanel();
         JButton button = new JButton("Choose a song");
         JButton copyButton = new JButton("Copy");
@@ -67,6 +74,7 @@ public class Gen implements OnsetHandler {
             }
         });
 
+        frame.pack();
         frame.setVisible(true);
     }
 
